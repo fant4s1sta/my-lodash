@@ -5,27 +5,16 @@
  * @returns {Function} 节流后的函数
  */
 const throttle = (func, delay) => {
-  let lastTime = 0;
+  let nextTimeToCall = 0;
+  let timeout = null;
   return function (...args) {
-    const now = Date.now();
-    if (now - lastTime >= delay) {
+    const timeToWait = Math.max(0, nextTimeToCall - Date.now());
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
       func.apply(this, args);
-      lastTime = now;
-    }
+      nextTimeToCall = Date.now() + delay;
+    }, timeToWait);
   }
 };
-
-const throttle2 = (func, delay) => {
-  let timer;
-  return function (...args) {
-    const context = this;
-    if (!timer) {
-      timer = setTimeout(() => {
-        func.apply(context, args);
-        timer = null;
-      }, delay);
-    }
-  }
-}
 
 module.exports = throttle;
